@@ -63,6 +63,18 @@ body > div {
 }
 
 .align_content h2 { margin: 0; }
+.toc {
+    margin: 24px 0;
+    padding: 20px 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+}
+
+.toc h2 { margin-bottom: 10px; font-size: 1rem; }
+.toc ul { margin: 0; }
+h2[id] { scroll-margin-top: 24px; }
+
 .align_content img {
     width: 30px;
     height: 30px;
