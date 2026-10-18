@@ -25,5 +25,10 @@
         <li><strong>Resources → WSL Integration</strong> に進む。</li>
         <li>WSL Integrationの項目をすべてONにする（UbuntuもONにする）。</li>
     </ol>
+    <h3>Docker連携の動作確認</h3>
+    <p>Ubuntuのターミナルで、次のコマンドを実行する。</p>
+    <pre><code>docker run hello-world</code></pre>
+    <p><code>Hello from Docker!</code> と表示されれば、Docker連携は成功。</p>
+    <p>Docker Desktopの<strong>Containers</strong>画面にも、新しいコンテナが作成されていることを確認する。hello-worldのコンテナはメッセージを表示すると終了するため、停止済みの状態で表示されていれば正常。</p>
 </body>
 </html>

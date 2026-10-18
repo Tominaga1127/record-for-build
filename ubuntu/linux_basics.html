@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux基礎知識</title>
+    <link rel="stylesheet" href="../css/top.css">
+    <style>
+        .table-scroll { overflow-x: auto; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+        th { background: var(--surface); }
+    </style>
+</head>
+<body>
+    <h1>Linux基礎知識</h1>
+    <p><a href="../index.html#ubuntu">WSL &amp; Ubuntuの節に戻る</a></p>
+
+    <nav class="toc" aria-labelledby="toc-title">
+        <h2 id="toc-title">目次</h2>
+        <ul>
+            <li><a href="#commands">よく使うコマンド一覧</a></li>
+            <li><a href="#paths">Windows・Linux間のパスの対応関係</a>
+                <ul>
+                    <li><a href="#windows-files">UbuntuからWindowsのファイルへ移動する</a></li>
+                    <li><a href="#explorer">Ubuntuの現在の場所をエクスプローラーで開く</a></li>
+                    <li><a href="#path-conversion">WSLでパス表記を変換する</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <h2 id="commands">1. よく使うコマンド一覧</h2>
+    <div class="table-scroll">
+        <table>
+            <thead><tr><th scope="col">コマンド・使用例</th><th scope="col">用途</th></tr></thead>
+            <tbody>
+                <tr><td><code>pwd</code></td><td>現在いるディレクトリの絶対パスを表示する。</td></tr>
+                <tr><td><code>ls</code> / <code>ls -la</code></td><td>ファイル一覧を表示する。<code>-la</code>で隠しファイルを含めて詳細表示する。</td></tr>
+                <tr><td><code>cd /path/to/dir</code></td><td>指定したディレクトリへ移動する。<code>cd ..</code>で親へ、<code>cd ~</code>でホームへ移動する。</td></tr>
+                <tr><td><code>mkdir -p work/project</code></td><td>ディレクトリを作成する。<code>-p</code>で途中のディレクトリも作成する。</td></tr>
+                <tr><td><code>touch memo.txt</code></td><td>空のファイルを作成する。既存ファイルの場合は更新日時を変更する。</td></tr>
+                <tr><td><code>cp memo.txt memo-copy.txt</code></td><td>ファイルをコピーする。ディレクトリは<code>cp -r source_dir copy_dir</code>でコピーする。</td></tr>
+                <tr><td><code>mv memo.txt notes.txt</code></td><td>ファイルやディレクトリを移動する、または名前を変更する。</td></tr>
+                <tr><td><code>rm -i memo.txt</code></td><td>確認してからファイルを削除する。ディレクトリごとの削除は<code>rm -ri dir</code>。通常はゴミ箱に入らないため、対象を確認する。</td></tr>
+                <tr><td><code>cat memo.txt</code></td><td>ファイルの内容を表示する。</td></tr>
+                <tr><td><code>less memo.txt</code></td><td>長いファイルをスクロールして読む。<code>q</code>で終了する。</td></tr>
+                <tr><td><code>head -n 20 memo.txt</code> / <code>tail -n 20 memo.txt</code></td><td>先頭・末尾の20行を表示する。<code>tail -f app.log</code>でログの追記を監視する。</td></tr>
+                <tr><td><code>grep -n "error" app.log</code></td><td>文字列を含む行を行番号付きで検索する。</td></tr>
+                <tr><td><code>find . -name "*.txt"</code></td><td>現在のディレクトリ以下から、名前に一致するファイルやディレクトリを探す。</td></tr>
+                <tr><td><code>nano memo.txt</code></td><td>テキストを編集する。<code>Ctrl + O</code>、Enterで保存し、<code>Ctrl + X</code>で終了する。</td></tr>
+                <tr><td><code>sudo apt update</code></td><td>インストール可能なパッケージの一覧を更新する。</td></tr>
+                <tr><td><code>sudo apt install git</code></td><td>パッケージをインストールする。<code>sudo</code>は管理者権限で実行する指定。</td></tr>
+                <tr><td><code>chmod +x script.sh</code></td><td>スクリプトに実行権限を付ける。<code>./script.sh</code>で実行する。</td></tr>
+                <tr><td><code>ps aux</code> / <code>top</code></td><td>実行中のプロセスを確認する。<code>top</code>は随時更新され、<code>q</code>で終了する。</td></tr>
+                <tr><td><code>df -h</code> / <code>du -sh .</code></td><td>ファイルシステムの空き容量、現在のディレクトリの使用容量を確認する。</td></tr>
+                <tr><td><code>man ls</code></td><td>コマンドの説明を読む。<code>q</code>で終了する。</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p>入力途中でTabを押すとコマンドやパスを補完できる。実行中のコマンドを中断するときは<code>Ctrl + C</code>を使う。</p>
+
+    <h2 id="paths">2. Windows・Linux間のパスの対応関係</h2>
+    <p>WSLの標準設定では、WindowsのドライブはUbuntuの<code>/mnt</code>以下から参照できる。逆に、Ubuntu内のファイルはWindowsのエクスプローラーから<code>\\wsl.localhost\Ubuntu\</code>で参照できる。</p>
+    <div class="table-scroll">
+        <table>
+            <thead><tr><th scope="col">対象</th><th scope="col">Windows側のパス</th><th scope="col">Ubuntu側のパス</th></tr></thead>
+            <tbody>
+                <tr><td>Cドライブ</td><td><code>C:\</code></td><td><code>/mnt/c/</code></td></tr>
+                <tr><td>Dドライブ（ある場合）</td><td><code>D:\</code></td><td><code>/mnt/d/</code></td></tr>
+                <tr><td>Windowsのユーザーフォルダ</td><td><code>C:\Users\Tommy</code></td><td><code>/mnt/c/Users/Tommy</code></td></tr>
+                <tr><td>このリポジトリ</td><td><code>C:\Users\Tommy\programing\record_for_build</code></td><td><code>/mnt/c/Users/Tommy/programing/record_for_build</code></td></tr>
+                <tr><td>Ubuntuのホーム（ユーザー名がtommyの場合）</td><td><code>\\wsl.localhost\Ubuntu\home\tommy</code></td><td><code>/home/tommy</code>（<code>~</code>）</td></tr>
+                <tr><td>Ubuntuのルート</td><td><code>\\wsl.localhost\Ubuntu\</code></td><td><code>/</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p><code>Ubuntu</code>はWSLのディストリビューション名。実際の名前はWindowsのPowerShellで<code>wsl -l -v</code>を実行して確認する。Linuxのユーザー名はWindowsのユーザー名と異なる場合があり、Ubuntuで<code>whoami</code>を実行すると確認できる。</p>
+    <ul>
+        <li>Windowsの区切り文字は<code>\</code>、Linuxは<code>/</code>。</li>
+        <li>Linuxの<code>~</code>はLinuxユーザーのホームを表す。Windowsの<code>C:\Users\Tommy</code>とは別の場所。</li>
+        <li>Linux側のファイル名は大文字・小文字を区別する。<code>Memo.txt</code>と<code>memo.txt</code>は別のファイル。</li>
+        <li>パスに空白がある場合は、<code>cd "/mnt/c/Users/Tommy/My Documents"</code>のように引用符で囲む。</li>
+        <li><code>.</code>は現在のディレクトリ、<code>..</code>は親ディレクトリ。<code>/</code>で始まるパスは絶対パス、それ以外は通常、現在の場所からの相対パス。</li>
+    </ul>
+    <h3 id="windows-files">UbuntuからWindowsのファイルへ移動する</h3>
+    <pre><code>cd /mnt/c/Users/Tommy/programing/record_for_build
+pwd</code></pre>
+    <h3 id="explorer">Ubuntuの現在の場所をエクスプローラーで開く</h3>
+    <pre><code>explorer.exe .</code></pre>
+    <h3 id="path-conversion">WSLでパス表記を変換する</h3>
+    <pre><code># Windows形式からLinux形式へ
+wslpath -u 'C:\Users\Tommy\programing\record_for_build'
+
+# Linux形式からWindows形式へ
+wslpath -w /mnt/c/Users/Tommy/programing/record_for_build</code></pre>
+</body>
+</html>
