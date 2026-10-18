@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ubuntuのセットアップ</title>
+    <link rel="stylesheet" href="../css/top.css">
+</head>
+<body>
+    <h1>Ubuntuのセットアップ</h1>
+    <p><a href="../index.html#ubuntu">WSL &amp; Ubuntuの節に戻る</a></p>
+
+    <h2>1. Ubuntuのインストール</h2>
+    <h3>WSLのインストール</h3>
+    <p>WindowsのPowerShellで、次のコマンドを実行する。</p>
+    <pre><code>wsl --install</code></pre>
+
+    <h3>Ubuntuのインストール</h3>
+    <p>次のコマンドでUbuntuをインストールする。</p>
+    <pre><code>wsl --install -d ubuntu</code></pre>
+
+    <h2>2. Docker DesktopとUbuntuの連携</h2>
+    <ol>
+        <li>Docker Desktopの設定（Settings）を開く。</li>
+        <li><strong>Resources → WSL Integration</strong> に進む。</li>
+        <li>WSL Integrationの項目をすべてONにする（UbuntuもONにする）。</li>
+    </ol>
+</body>
+</html>
