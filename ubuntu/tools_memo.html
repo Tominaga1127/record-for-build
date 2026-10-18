@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ubuntuに入れたいツールメモ</title>
+    <link rel="stylesheet" href="../css/top.css">
+</head>
+<body>
+    <h1>Ubuntuに入れたいツールメモ</h1>
+    <p><a href="../index.html#ubuntu">トップページのWSL &amp; Ubuntuの節に戻る</a></p>
+    <p>Ubuntuで開発するために入れたいツールの候補。インストール済みかどうかとは別に、用途をメモしておく。</p>
+
+    <h2>入れたいツール</h2>
+    <ul>
+        <li><strong>Git</strong>：ソースコードの変更履歴を管理し、GitHubとの連携に使う。Ubuntu側にも入れておきたい。</li>
+        <li><strong>GCC</strong>：C・C++のコンパイルに使う。C++では主に<code>g++</code>を使う。</li>
+        <li><strong>Miniforge</strong>：Pythonなどの環境・パッケージ管理に使う。プロジェクトごとに環境を分けたい。</li>
+        <li><strong>Docker CLI</strong>：Ubuntuのターミナルからコンテナやイメージを操作する。</li>
+        <li><strong>Codex CLI</strong>：ターミナルで使う開発支援ツール。</li>
+    </ul>
+    <p>Docker CLIは、Docker DesktopとのWSL連携で使えるようになっている場合がある。追加インストールの前に<code>docker --version</code>と<code>docker run hello-world</code>で確認する。</p>
+
+    <h2>追加で入れたいおすすめツール</h2>
+    <h3>C・C++開発</h3>
+    <ul>
+        <li><strong>build-essential</strong>：GCC・G++・makeなど、Ubuntuでのビルドに必要な基本ツールをまとめて導入するためのパッケージ。</li>
+        <li><strong>GDB</strong>：プログラムを途中で止めたり変数を確認したりするデバッガー。</li>
+        <li><strong>CMake</strong>：複数のソースファイルやライブラリを使うプロジェクトのビルド設定を管理する。</li>
+    </ul>
+    <p>まずはGCCを含むbuild-essentialから揃え、デバッグにはGDB、プロジェクトが大きくなったらCMakeを試したい。<a href="https://ubuntu.com/developers/docs/howto/gcc-setup/">参考：Ubuntu公式のGCC開発環境ガイド</a></p>
+
+    <h3>ファイル検索・閲覧</h3>
+    <ul>
+        <li><strong>fd</strong>：ファイル名から素早くファイルを探す。<a href="https://github.com/sharkdp/fd">公式リポジトリ</a></li>
+        <li><strong>bat</strong>：コードを構文の色分けや行番号付きで表示する。<a href="https://github.com/sharkdp/bat">公式リポジトリ</a></li>
+    </ul>
+</body>
+</html>
