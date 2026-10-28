@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VS CodeとWSLの連携</title>
+    <link rel="stylesheet" href="../css/top.css">
+</head>
+<body>
+    <h1>VS CodeとWSLの連携</h1>
+    <p><a href="../index.html#ubuntu">WSL &amp; Ubuntuの節に戻る</a></p>
+    <p>WindowsのVS CodeからUbuntu内のファイルを編集し、Ubuntuのコンパイラーや実行環境を使うための手順。WSL接続したウィンドウでは、ターミナルや開発用の拡張機能がUbuntu側で動く。</p>
+
+    <nav class="toc" aria-labelledby="toc-title">
+        <h2 id="toc-title">目次</h2>
+        <ul>
+            <li><a href="#prepare">Windows側・Ubuntu側の準備</a></li>
+            <li><a href="#connect">Ubuntuのフォルダーを開く</a></li>
+            <li><a href="#check">接続確認と拡張機能</a></li>
+            <li><a href="#daily">普段の使い方</a></li>
+            <li><a href="#trouble">うまく接続できない場合</a></li>
+        </ul>
+    </nav>
+
+    <h2 id="prepare">1. Windows側・Ubuntu側の準備</h2>
+    <h3>Windows側</h3>
+    <ol>
+        <li><a href="./index.html#ubuntu-install">Ubuntuのセットアップ</a>を済ませ、Ubuntuが起動することを確認する。PowerShellで<code>wsl -l -v</code>を実行するとディストリビューション名を確認できる。</li>
+        <li><a href="https://code.visualstudio.com/download">VS Code公式サイト</a>からWindows版をインストールする。追加タスクの<strong>PATHへの追加（Add to PATH）</strong>を有効にする。</li>
+        <li>WindowsのVS Codeを開き、<code>Ctrl + Shift + X</code>で拡張機能を表示する。</li>
+        <li>Microsoft提供の<strong>WSL</strong>（拡張機能ID：<code>ms-vscode-remote.remote-wsl</code>）をインストールする。</li>
+    </ol>
+    <p>この連携ではVS Code本体はWindows側にインストールする。Ubuntu側にLinux版VS Codeを別途入れる必要はない。</p>
+    <h3>Ubuntu側</h3>
+    <p>Ubuntuのターミナルで、接続時のダウンロードに使うツールを準備する。</p>
+    <pre><code>sudo apt update
+sudo apt install wget ca-certificates</code></pre>
+
+    <h2 id="connect">2. Ubuntuのフォルダーを開く</h2>
+    <p>Ubuntuのターミナルで、作業フォルダーに移動して次を実行する。</p>
+    <pre><code>mkdir -p ~/work/wsl-practice
+cd ~/work/wsl-practice
+code .</code></pre>
+    <p><code>.</code>は現在のフォルダー。初回はUbuntu側へVS Code Serverが自動で導入されるため、ダウンロードが完了するまで待つ。インターネット接続が必要。</p>
+    <p>VS Codeから接続する場合は<code>Ctrl + Shift + P</code>でコマンドパレットを開き、<strong>WSL: Connect to WSL using Distro...</strong>でUbuntuを選ぶ。そのウィンドウで「ファイル → フォルダーを開く」から<code>/home/ユーザー名/work/wsl-practice</code>を開く。既存のフォルダーを開いている場合は<strong>WSL: Reopen Folder in WSL</strong>でも切り替えられる。表示名は言語やバージョンによって異なる。</p>
+
+    <h2 id="check">3. 接続確認と拡張機能</h2>
+    <ol>
+        <li>VS Code左下に<strong>WSL: Ubuntu</strong>などの接続先が表示されていることを確認する。</li>
+        <li>「ターミナル → 新しいターミナル」で統合ターミナルを開く。</li>
+        <li>次のコマンドでLinux上の作業フォルダーが表示されることを確認する。</li>
+    </ol>
+    <pre><code>uname -s
+pwd
+whoami</code></pre>
+    <p><code>uname -s</code>は<code>Linux</code>、<code>pwd</code>は<code>/home/ユーザー名/work/wsl-practice</code>のようになる。Windowsの通常ウィンドウでターミナルだけUbuntuに切り替える操作とは異なり、WSL接続では拡張機能もUbuntu側の環境を利用できる。</p>
+    <p>Python、C/C++、Javaなどの開発用拡張機能は、WSL接続したウィンドウの拡張機能画面から導入する。既にWindows側へ導入済みで<strong>Install in WSL: Ubuntu</strong>が表示された場合はそれを選ぶ。表示やテーマなど、Windows側で動く拡張機能もある。</p>
+    <p>コンパイラーやJDKなどは<a href="./index.html#prepare">Ubuntuセットアップの開発ツール手順</a>に従ってUbuntu側へ入れる。PythonでMiniforgeを使う場合は、コマンドパレットの<strong>Python: Select Interpreter</strong>でUbuntu側の対象環境を選ぶ。</p>
+
+    <h2 id="daily">4. 普段の使い方</h2>
+    <ol>
+        <li>Ubuntuでプロジェクトへ移動し、<code>code .</code>を実行する。</li>
+        <li>VS Codeでファイルを作成・編集し、<code>Ctrl + S</code>で保存する。</li>
+        <li>統合ターミナルでコンパイルやプログラム実行を行う。</li>
+    </ol>
+    <p>例えば<a href="./index.html#java">Javaの手順</a>で作ったプロジェクトなら、Ubuntuで次を実行して開く。</p>
+    <pre><code>cd ~/work/java-practice
+code .</code></pre>
+    <p>VS Codeで<code>Hello.java</code>を編集・保存したら、統合ターミナルで実行する。</p>
+    <pre><code>javac Hello.java
+java Hello</code></pre>
+    <p>作業ファイルは<code>~/work</code>などUbuntu側に置くと、Linuxのファイル操作で扱いやすい。Windows側のファイルが必要な場合は<code>/mnt/c/...</code>から開ける。<a href="./linux_basics.html#paths">Windows・Linuxのパスの対応関係</a>も参照。</p>
+    <p>接続を終了するときは、コマンドパレットの<strong>Remote: Close Remote Connection</strong>または「ファイル → リモート接続を閉じる」を使う。WSL接続を閉じてもUbuntu自体は停止しない。</p>
+
+    <h2 id="trouble">5. うまく接続できない場合</h2>
+    <ul>
+        <li><strong>code: command not found</strong>：Windows版VS CodeのPATHへの追加を確認し、Ubuntuのターミナルを開き直す。すぐに接続する場合は、WindowsのVS CodeからコマンドパレットでWSLへ接続する。</li>
+        <li><strong>左下にWSLの接続先が出ない</strong>：WSL拡張機能の有効化を確認し、コマンドパレットで接続し直す。複数のディストリビューションがある場合はUbuntuを指定する。</li>
+        <li><strong>Serverの導入で止まる</strong>：ネットワーク、プロキシ、証明書の設定を確認する。コマンドパレットの<strong>WSL: Show Log</strong>からエラーを確認する。</li>
+        <li><strong>javaやgccが見つからない</strong>：Ubuntu側にツールを入れたか確認する。統合ターミナルで<code>command -v java</code>や<code>command -v gcc</code>を実行し、接続先と実行ファイルの場所を調べる。</li>
+    </ul>
+    <p>参考：<a href="https://code.visualstudio.com/docs/remote/wsl">VS Code公式：Developing in WSL</a>・<a href="https://learn.microsoft.com/windows/wsl/tutorials/wsl-vscode">Microsoft公式：VS CodeとWSLの導入手順</a></p>
+</body>
+</html>

@@ -10,7 +10,21 @@
     <h1>Ubuntuのセットアップ</h1>
     <p><a href="../index.html#ubuntu">WSL &amp; Ubuntuの節に戻る</a></p>
 
-    <h2>1. Ubuntuのインストール</h2>
+    <nav class="toc" aria-labelledby="toc-title">
+        <h2 id="toc-title">目次</h2>
+        <ul>
+            <li><a href="#ubuntu-install">Ubuntuのインストール</a></li>
+            <li><a href="#docker">Docker DesktopとUbuntuの連携</a></li>
+            <li><a href="#prepare">開発ツールの共通準備</a></li>
+            <li><a href="#github">Git</a></li>
+            <li><a href="#gcc">GCC（C・C++）</a></li>
+            <li><a href="#miniforge">Miniforge</a></li>
+            <li><a href="#java">Java（OpenJDK）</a></li>
+            <li><a href="#codex">Codex CLI</a></li>
+        </ul>
+    </nav>
+
+    <h2 id="ubuntu-install">1. Ubuntuのインストール</h2>
     <h3>WSLのインストール</h3>
     <p>WindowsのPowerShellで、次のコマンドを実行する。</p>
     <pre><code>wsl --install</code></pre>
@@ -19,7 +33,7 @@
     <p>次のコマンドでUbuntuをインストールする。</p>
     <pre><code>wsl --install -d ubuntu</code></pre>
 
-    <h2>2. Docker DesktopとUbuntuの連携</h2>
+    <h2 id="docker">2. Docker DesktopとUbuntuの連携</h2>
     <ol>
         <li>Docker Desktopの設定（Settings）を開く。</li>
         <li><strong>Resources → WSL Integration</strong> に進む。</li>
@@ -30,5 +44,167 @@
     <pre><code>docker run hello-world</code></pre>
     <p><code>Hello from Docker!</code> と表示されれば、Docker連携は成功。</p>
     <p>Docker Desktopの<strong>Containers</strong>画面にも、新しいコンテナが作成されていることを確認する。hello-worldのコンテナはメッセージを表示すると終了するため、停止済みの状態で表示されていれば正常。</p>
+
+    <h2 id="prepare">3. 開発ツールの共通準備</h2>
+    <p>以下はUbuntu 24.04 LTS以降のBashを想定。すべて<strong>Ubuntuのターミナル</strong>で実行する。WSLの場合もPowerShellではなくUbuntuを開く。Windowsに同じツールが入っていても、Ubuntu側には別途インストールする。Dockerとの連携は、以下のツールの導入には必須ではない。</p>
+    <pre><code>sudo apt update
+sudo apt install curl ca-certificates
+mkdir -p ~/work
+cd ~/work</code></pre>
+    <ul>
+        <li><code>apt update</code>はパッケージ一覧の更新。各<code>apt install</code>で表示される内容を確認してから、確認入力で<code>Y</code>を選ぶ。</li>
+        <li><code>sudo</code>で求められるのはUbuntuのユーザーパスワード。入力中は文字が表示されない。MiniforgeやCodexのインストーラーには<code>sudo</code>を付けない。</li>
+        <li>WSLでの作業場所は<code>~/work</code>などLinux側にすると、Linuxの権限やファイル操作を扱いやすい。</li>
+        <li>外部のインストーラーは公式の配布元を確認する。ダウンロードに失敗した場合は後続を実行せず、通信環境を確認する。</li>
+    </ul>
+
+    <h2 id="github">4. Git</h2>
+    <p>Gitは変更履歴を管理するツール。GitHubはGitのリポジトリを共有するWebサービス。</p>
+    <h3>インストールと初期設定</h3>
+    <pre><code>sudo apt install git
+git --version
+git config --global user.name "Your Name"
+git config --global user.email "YOUR_EMAIL"</code></pre>
+    <p>名前とメールアドレスは自分のものに置き換える。コミットに記録されるため、メールを公開したくない場合はGitHubのSettings → Emailsにある自分のnoreplyアドレスを使う。名前・メールの設定はGitHubへのログインとは別。</p>
+    <h3>具体的な使い方</h3>
+    <p>公開リポジトリの取得例。<code>OWNER</code>と<code>REPOSITORY</code>は実際の所有者名・リポジトリ名に置き換える。</p>
+    <pre><code>cd ~/work
+git clone https://github.com/OWNER/REPOSITORY.git
+cd REPOSITORY
+git switch -c docs/update-memo
+# ファイルを編集してから確認する
+git status
+git diff
+# memo.txtを編集した場合の例
+git add memo.txt
+git commit -m "Update memo"</code></pre>
+    <p>ここまでのコミットはローカルに保存される。非公開リポジトリの取得やGitHubへの送信には別途認証と権限が必要。<a href="../git_memo/index1.html">Gitの基本操作のメモ</a>も参照。</p>
+
+    <h2 id="gcc">5. GCC（C・C++）</h2>
+    <p><code>build-essential</code>でGCC・G++・makeなどの基本的なビルドツールをまとめて導入する。</p>
+    <h3>インストールと確認</h3>
+    <pre><code>sudo apt install build-essential
+gcc --version
+g++ --version
+make --version</code></pre>
+    <p>Cには<code>gcc</code>、C++には標準C++ライブラリもリンクする<code>g++</code>を使う。Ubuntuで作った実行ファイルはLinux用で、Windows用のexeとは異なる。コンパイラーのバージョンはUbuntuのリリースによって異なる。</p>
+    <h3>Cプログラムを作成・実行する</h3>
+    <pre><code>mkdir -p ~/work/gcc-practice
+cd ~/work/gcc-practice
+cat &gt; hello.c &lt;&lt;'EOF'
+#include &lt;stdio.h&gt;
+
+int main(void) {
+    puts("Hello, Ubuntu!");
+    return 0;
+}
+EOF
+gcc -std=c17 -Wall -Wextra -g hello.c -o hello
+./hello</code></pre>
+    <p><code>Hello, Ubuntu!</code>と表示されれば成功。<code>-Wall -Wextra</code>は警告表示、<code>-g</code>はデバッグ情報の付加、<code>-o hello</code>は出力名の指定。実行時は現在のディレクトリを示す<code>./</code>を付ける。コンパイルに失敗したらエラーを直して再実行する。</p>
+    <h3>C++の場合</h3>
+    <pre><code>cat &gt; hello.cpp &lt;&lt;'EOF'
+#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; "Hello, C++!\n";
+}
+EOF
+g++ -std=c++17 -Wall -Wextra -g hello.cpp -o hello-cpp
+./hello-cpp</code></pre>
+    <p><a href="https://ubuntu.com/developers/docs/howto/gcc-setup/">参考：Ubuntu公式のGCC開発環境ガイド</a></p>
+
+    <h2 id="miniforge">6. Miniforge</h2>
+    <p>Pythonなどの実行環境をプロジェクトごとに分けるためのツール。Miniforgeを入れると<code>conda</code>や<code>mamba</code>を使える。</p>
+    <h3>インストールと確認</h3>
+    <pre><code>mkdir -p ~/Downloads
+cd ~/Downloads
+uname -m
+curl -fL -o Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3.sh</code></pre>
+    <ul>
+        <li>WSLでも<strong>Linux用</strong>を使う。上記URLはOSとCPUを自動判定する。一般的なPCは<code>x86_64</code>、ARM64は<code>aarch64</code>。対応アーキテクチャは公式ページで確認する。</li>
+        <li>ライセンスを読んで同意する場合は<code>yes</code>を入力。インストール先は既定の<code>~/miniforge3</code>を想定し、最後のシェル初期化の質問も<code>yes</code>を選ぶ。</li>
+        <li>同じUbuntuにAnaconda・Minicondaがある場合は、<code>command -v conda</code>で既存環境を確認する。既存のインストール先へ上書きせず、どの環境を使うか決める。</li>
+    </ul>
+    <p>インストール後はUbuntuのターミナルを開き直して、次を実行する。</p>
+    <pre><code>conda --version
+conda info --base
+conda config --set auto_activate false</code></pre>
+    <p>自動有効化を無効にすると、次回からbase環境が自動で有効にならない。<code>conda</code>が見つからない場合は、既定の場所に入れたことを確認して<code>~/miniforge3/bin/conda init bash</code>を実行し、ターミナルを開き直す。</p>
+    <h3>Python環境を作って使う</h3>
+    <pre><code>conda create -n py-study python=3.12
+conda activate py-study
+conda install numpy
+python --version
+python -c "import numpy as np; print(np.arange(5))"
+conda env list
+conda deactivate</code></pre>
+    <p><code>[0 1 2 3 4]</code>と表示されれば動作確認は完了。次回使うときも<code>conda activate py-study</code>で有効にする。baseに作業用パッケージを集めず、用途ごとに環境を作る。UbuntuのシステムPythonを置き換えたり、<code>sudo conda</code>や<code>sudo pip</code>で環境にパッケージを入れたりしない。</p>
+    <p>環境の構成を保存・再作成する例。<code>environment.yml</code>はプロジェクトのディレクトリで作成する。</p>
+    <pre><code>conda env export -n py-study --from-history &gt; environment.yml
+# 別の環境名で再作成する場合
+conda env create -n py-study-copy -f environment.yml</code></pre>
+    <p><code>--from-history</code>は明示的に指定した依存関係を保存するため、全パッケージのバージョンを固定するものではない。<a href="https://github.com/conda-forge/miniforge">参考：Miniforge公式の導入・使用手順</a></p>
+
+    <h2 id="java">7. Java（OpenJDK）</h2>
+    <p>Javaの開発には、実行用の<code>java</code>とコンパイラーの<code>javac</code>を含むJDKを入れる。ここではUbuntu 24.04 LTS以降でOpenJDK 21を指定する。プロジェクトに指定バージョンがある場合はそちらに合わせる。</p>
+    <h3>インストールと確認（Ubuntuで実行）</h3>
+    <pre><code>sudo apt update
+sudo apt install openjdk-21-jdk
+java --version
+javac --version</code></pre>
+    <p>両方にバージョン21が表示されれば確認完了。開発にはJREだけでは足りないため、<code>-jdk</code>のパッケージを選ぶ。Windows側にJavaがあっても、WSLのUbuntu側には別途インストールする。</p>
+    <h3>プログラムを作成・実行する</h3>
+    <pre><code>mkdir -p ~/work/java-practice
+cd ~/work/java-practice
+cat &gt; Hello.java &lt;&lt;'EOF'
+public class Hello {
+    public static void main(String[] args) {
+        System.out.println("Hello, Java!");
+    }
+}
+EOF
+javac Hello.java
+java Hello</code></pre>
+    <p><code>Hello, Java!</code>と表示されれば成功。公開クラス名<code>Hello</code>とファイル名<code>Hello.java</code>は大文字・小文字も一致させる。<code>javac</code>で<code>Hello.class</code>を生成し、実行時は<code>java Hello</code>のように拡張子を付けない。</p>
+    <h3>複数のJavaが入っている場合</h3>
+    <pre><code>sudo update-alternatives --config java
+sudo update-alternatives --config javac
+java --version
+javac --version</code></pre>
+    <p>選択肢がある場合は両方ともOpenJDK 21にそろえる。<code>JAVA_HOME</code>は上の実行例には不要。ビルドツールなどから要求された場合だけ設定する。次は現在選ばれている<code>javac</code>からJDKの場所を求め、現在のBashに設定する例。</p>
+    <pre><code>export JAVA_HOME="$(dirname "$(dirname "$(readlink -f /usr/bin/javac)")")"
+echo "$JAVA_HOME"</code></pre>
+    <p>毎回使う場合は上記の<code>export</code>行を<code>~/.bashrc</code>に一度だけ追記し、ターミナルを開き直す。既存の<code>JAVA_HOME</code>設定がある場合は重複させず更新する。<a href="https://ubuntu.com/developers/docs/howto/java-setup/">参考：Ubuntu公式のJava開発環境ガイド</a></p>
+
+    <h2 id="codex">8. Codex CLI</h2>
+    <p>ターミナルからプロジェクトの説明、コード修正、コマンド実行などを依頼するOpenAIの開発支援ツール。</p>
+    <h3>インストールと確認</h3>
+    <p>公式のLinux用スタンドアロンインストーラーを使う。この方式ではNode.js・npmを別途入れる必要はない。スクリプトをダウンロードし、内容を確認してから実行する。</p>
+    <pre><code>cd ~/Downloads
+curl -fsSL https://chatgpt.com/codex/install.sh -o codex-install.sh
+less codex-install.sh
+# lessはqで閉じる。内容を確認したら実行する
+sh codex-install.sh</code></pre>
+    <p>完了時にPATHの設定などが表示された場合はその指示に従い、Ubuntuのターミナルを開き直す。</p>
+    <pre><code>command -v codex
+codex --version</code></pre>
+    <p>見つからない場合はインストーラーが表示したインストール先とPATHを確認する。WSLではWindows側のCodexと取り違えないよう、<code>command -v codex</code>の結果も確認する。</p>
+    <h3>ログインして依頼する</h3>
+    <p>GitHubの節で取得したプロジェクトなど、作業したいディレクトリへ移動して起動する。以下の<code>REPOSITORY</code>は実際のディレクトリ名に置き換える。</p>
+    <pre><code>cd ~/work/REPOSITORY
+git status
+codex</code></pre>
+    <p>初回起動時は「Sign in with ChatGPT」など、画面に表示される認証方法を選んでログインする。WSLでブラウザーが開かない場合は、表示されたURLをWindowsのブラウザーで開く。利用できる認証方法や利用枠はアカウントによって異なるため、ログイン画面と公式ドキュメントを確認する。</p>
+    <p>起動後の入力欄で、例えば次のように依頼する。</p>
+    <pre><code>このプロジェクトの構成と実行方法を日本語で説明してください。
+hello.cに入力値のチェックを追加し、コンパイルして動作確認してください。</code></pre>
+    <ul>
+        <li>作業前に変更をコミットするなど、戻せる状態にしておく。実行されるコマンドや承認の内容を確認する。</li>
+        <li>作業ディレクトリと権限設定を確認する。通常の利用で<code>sudo codex</code>や承認・保護機能を無効にするオプションは使わない。</li>
+        <li>依頼文やソースにAPIキー・パスワードなどを含めない。生成されたコードは確認してから利用する。</li>
+    </ul>
+    <p>終了後は<code>git diff</code>で変更内容を確認する。更新するときは同じインストーラーのダウンロード・確認・実行手順を繰り返す。<a href="https://learn.chatgpt.com/docs/codex/cli">参考：OpenAI公式のCodex CLI導入・使用手順</a></p>
 </body>
 </html>
